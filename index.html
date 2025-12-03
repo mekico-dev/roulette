@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ルーレット！「シールとかもらえ～る」</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* --- 全体レイアウト --- */
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;       /* 外側はシンプルに */
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      max-width: 540px;
+      width: 100%;
+      box-sizing: border-box;
+
+      /* ▼ カード部分だけに背景画像を適用 */
+      background-image: url('bg.png');   /* ← ここを自分のファイル名に */
+      background-size: cover;
+      background-position: center;
+
+      padding: 16px 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    /* 内側の要素は読みやすいように淡いパネルの上に載せる */
+    .inner {
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 16px;
+      padding: 12px 12px 18px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 4px;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 12px;
+      text-align: center;
+      color: #777;
+      margin-bottom: 12px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin: 8px 0 16px;
+    }
+
+    button {
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      background: #1976d2;
+      color: #fff;
+      font-weight: 600;
+      transition: transform 0.05s ease, box-shadow 0.05s ease, opacity 0.2s;
+      box-shadow: 0 4px 10px rgba(25,118,210,0.3);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 24px solid #e53935;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+      z-index: 2;
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 12px;
+      min-height: 24px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .result span {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff3cd;
+      border: 1px solid #ffe08a;
+    }
+
+    .prize-list {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+    }
+
+    .prize-card {
+      border-radius: 12px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fafafa;
+      transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+    }
+
+    .prize-card img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .prize-card .name {
+      font-size: 13px;
+    }
+
+    .prize-card.selected {
+      border-color: #ffb300;
+      box-shadow: 0 0 0 2px rgba(255,179,0,0.4);
+      transform: translateY(-2px);
+      background: #fffdf5;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+    }
+
+    /* --- スマホ向けレイアウト調整 --- */
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+      .app {
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      }
+      .inner {
+        padding: 10px 10px 14px;
+        border-radius: 12px;
+      }
+      h1 {
+        font-size: 18px;
+      }
+      .subtitle {
+        font-size: 11px;
+      }
+      button {
+        width: 100%;       /* 押しやすいように全幅ボタンに */
+      }
+      .result {
+        font-size: 14px;
+      }
+      .prize-list {
+        grid-template-columns: 1fr;  /* シール一覧を1列に */
+      }
+      .prize-card img {
+        width: 44px;
+        height: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="inner">
+      <h1>ルーレット！「シールとかもらえ～る」</h1>
+      <div class="subtitle">当たったキャラのシールをプレゼント！</div>
+
+      <div class="controls">
+        <button id="spinBtn">まわす！</button>
+      </div>
+
+      <div class="wheel-wrapper">
+        <div class="pointer"></div>
+        <canvas id="wheelCanvas" width="400" height="400"></canvas>
+      </div>
+
+      <div class="result" id="result"></div>
+      <div class="prize-list" id="prizeList"></div>
+
+      <div class="footer-note">GitHub Pages 用・静的コンテンツ</div>
+    </div>
+  </div>
+
+  <script>
+    /* --- シール設定（画像ファイル名を合わせてください） --- */
+    const prizes = [
+      { name: '神話の案内人 ミスミ',   imageSrc: 'flower.png' },
+      { name: 'ニット帽の ニコ', imageSrc: 'hatgirl.png' },
+      { name: 'ブルーベリーな ニコ', imageSrc: 'purple.png' },
+      { name: 'ニコのキーホルダー', imageSrc: 'keyholder.png' }
+    ];
+
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const radius = canvas.width / 2;
+    const spinBtn = document.getElementById('spinBtn');
+    const resultEl = document.getElementById('result');
+    const prizeListEl = document.getElementById('prizeList');
+    const pointerAngle = -Math.PI / 2;
+    let spinning = false;
+
+    function drawWheel(rotation) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const sliceAngle = (Math.PI * 2) / prizes.length;
+
+      for (let i = 0; i < prizes.length; i++) {
+        const start = rotation + i * sliceAngle;
+        const end = start + sliceAngle;
+
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius - 4, start, end);
+        ctx.closePath();
+
+        const hue = (i * 360 / prizes.length) % 360;
+        ctx.fillStyle = `hsl(${hue}, 40%, 80%)`;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(start + sliceAngle / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#333';
+        ctx.font = '16px system-ui';
+        ctx.fillText(prizes[i].name, radius - 16, 5);
+        ctx.restore();
+      }
+
+      // 中央の白い円
+      ctx.beginPath();
+      ctx.arc(radius, radius, 40, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function renderPrizeList(selectedIndex = null) {
+      prizeListEl.innerHTML = '';
+      prizes.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'prize-card';
+        if (i === selectedIndex) card.classList.add('selected');
+
+        const img = document.createElement('img');
+        img.src = p.imageSrc;
+        img.alt = p.name;
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'name';
+        nameDiv.textContent = p.name;
+
+        card.appendChild(img);
+        card.appendChild(nameDiv);
+        prizeListEl.appendChild(card);
+      });
+    }
+
+    function spin() {
+      if (spinning) return;
+      spinning = true;
+      spinBtn.disabled = true;
+      resultEl.textContent = '';
+      renderPrizeList(null);
+
+      const sliceAngle = (Math.PI * 2) / prizes.length;
+      const targetRotation =
+        (5 + Math.random() * 3) * Math.PI * 2 + Math.random() * Math.PI * 2;
+      const duration = 4000;
+      const startTime = performance.now();
+
+      function easeOut(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function tick(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const rot = targetRotation * easeOut(t);
+        drawWheel(rot);
+
+        if (t < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          const finalR = targetRotation % (Math.PI * 2);
+          let rel = pointerAngle - finalR;
+          while (rel < 0) rel += Math.PI * 2;
+          const index = Math.floor(rel / sliceAngle);
+
+          const selected = prizes[index];
+          resultEl.innerHTML = `結果: <span>${selected.name} シール</span>`;
+          renderPrizeList(index);
+
+          spinning = false;
+          spinBtn.disabled = false;
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    spinBtn.addEventListener('click', spin);
+
+    // 初期表示
+    drawWheel(0);
+    renderPrizeList(null);
+  </script>
+</body>
+</html>
