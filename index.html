@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <title>ルーレット！「シールとかもらえ～る」</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA 用 -->
+  <meta name="theme-color" content="#f5f5f5" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- iOS のホーム画面アイコン（あとで作る） -->
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
   <style>
     /* --- 全体レイアウト --- */
     body {
@@ -349,6 +358,15 @@
     // 初期表示
     drawWheel(0);
     renderPrizeList(null);
+
+    // ▼ PWA: Service Worker 登録
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.log('SW registration failed', err);
+        });
+      });
+    }
   </script>
 </body>
 </html>
