@@ -460,10 +460,7 @@
 <body>
   <div class="app">
     <div class="inner">
-      <h1>
-        ルーレット！「シールとかもらえ～る」
-        <button id="resetBtn" class="reset-btn" title="最初に戻す">↻</button>
-      </h1>
+      <h1>ルーレット！「シールとかもらえ～る」</h1>
 
       <div class="controls">
         <button id="spinBtn">まわす！</button>
@@ -658,7 +655,6 @@
       if (spinning) return;
       spinning = true;
       spinBtn.disabled = true;
-      resetBtn.disabled = true;  // ← リロードボタンも非活性化
       resultEl.textContent = '';
       renderPrizeList(null);
       showSparkles();
@@ -694,7 +690,6 @@
 
           spinning = false;
           spinBtn.disabled = false;
-          resetBtn.disabled = false;  // ← リロードボタンも再活性化
         }
       }
 
@@ -702,15 +697,6 @@
     }
 
     spinBtn.addEventListener('click', spin);
-
-    // リセットボタン
-    const resetBtn = document.getElementById('resetBtn');
-    resetBtn.addEventListener('click', () => {
-      resultEl.textContent = '';
-      renderPrizeList(null);
-      hideSparkles();
-      drawWheel(0);
-    });
 
     // 初期表示
     drawWheel(0);
