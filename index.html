@@ -105,6 +105,25 @@
       font-size: 20px;
       margin: 0 0 4px;
       text-align: center;
+      position: relative;
+    }
+    
+    .reset-btn {
+      padding: 8px 12px;
+      font-size: 18px;
+      min-width: auto;
+      background: linear-gradient(135deg, 
+        rgba(255, 182, 193, 0.7) 0%,
+        rgba(173, 216, 230, 0.7) 50%,
+        rgba(255, 255, 176, 0.7) 100%);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 182, 193, 0.8);
+      color: #8B4513;
+      animation: none;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
     }
     .subtitle {
       font-size: 12px;
@@ -121,9 +140,14 @@
     }
 
     .reset-btn {
-      padding: 12px 16px;
+      padding: 14px;
       font-size: 20px;
       min-width: auto;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: linear-gradient(135deg, 
         rgba(255, 182, 193, 0.7) 0%,
         rgba(173, 216, 230, 0.7) 50%,
@@ -414,6 +438,12 @@
         font-size: 20px;
         font-weight: 700;
       }
+      .reset-btn {
+        width: 50px !important;
+        min-width: 50px !important;
+        padding: 12px !important;
+        font-size: 20px;
+      }
       .result {
         font-size: 14px;
       }
@@ -430,11 +460,13 @@
 <body>
   <div class="app">
     <div class="inner">
-      <h1>ルーレット！「シールとかもらえ～る」</h1>
+      <h1>
+        ルーレット！「シールとかもらえ～る」
+        <button id="resetBtn" class="reset-btn" title="最初に戻す">↻</button>
+      </h1>
 
       <div class="controls">
         <button id="spinBtn">まわす！</button>
-        <button id="resetBtn" class="reset-btn" title="最初に戻す">↻</button>
       </div>
 
       <div class="wheel-wrapper">
