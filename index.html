@@ -340,9 +340,10 @@
           requestAnimationFrame(tick);
         } else {
           const finalR = targetRotation % (Math.PI * 2);
-          let rel = pointerAngle - finalR;
+          // ポインターは0度（3時）なので
+          let rel = -finalR;  // マイナスにして計算
           while (rel < 0) rel += Math.PI * 2;
-          const index = Math.floor(rel / sliceAngle);
+          const index = Math.floor(rel / sliceAngle) % prizes.length;
 
           const selected = prizes[index];
           resultEl.innerHTML = `結果: <span>${selected.name}</span>`;
