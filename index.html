@@ -117,14 +117,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
       margin: 8px 0 16px;
-      position: relative;
     }
 
     .reset-btn {
-      padding: 16px 20px;
-      font-size: 24px;
+      padding: 12px 16px;
+      font-size: 20px;
       min-width: auto;
       background: linear-gradient(135deg, 
         rgba(255, 182, 193, 0.7) 0%,
@@ -134,8 +132,10 @@
       border: 2px solid rgba(255, 182, 193, 0.8);
       color: #8B4513;
       animation: none;
-      position: absolute;
-      right: 0;
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      z-index: 100;
     }
 
     .reset-btn:hover:not(:disabled) {
