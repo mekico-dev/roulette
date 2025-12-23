@@ -65,10 +65,10 @@
     }
 
     button {
-      padding: 10px 24px;
+      padding: 16px 48px;
       border-radius: 999px;
       border: none;
-      font-size: 14px;
+      font-size: 18px;
       cursor: pointer;
       background: #1976d2;
       color: #fff;
@@ -105,14 +105,15 @@
 
     .pointer {
       position: absolute;
-      top: -8px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 50%;           /* ← 上端から真ん中に */
+      left: auto;         /* ← 左からの指定を解除 */
+      right: -8px;        /* ← 右端から少し出す */
+      transform: translateY(-50%) rotate(90deg);  /* ← 中央揃え + 90度回転 */
       width: 0;
       height: 0;
       border-left: 14px solid transparent;
       border-right: 14px solid transparent;
-      border-bottom: 24px solid #e53935;
+      border-top: 24px solid #e53935;
       filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
       z-index: 2;
     }
@@ -247,7 +248,7 @@
     const spinBtn = document.getElementById('spinBtn');
     const resultEl = document.getElementById('result');
     const prizeListEl = document.getElementById('prizeList');
-    const pointerAngle = -Math.PI / 2;
+    const pointerAngle = 0;  // 15時の位置（0度 = 3時）
     let spinning = false;
 
     function drawWheel(rotation) {
